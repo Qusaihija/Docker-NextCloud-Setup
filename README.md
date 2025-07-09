@@ -30,7 +30,7 @@ docker run -p 8080:80 nextcloud-image:latest
 ```
 5. Access Nextcloud
 ```
-http://[IP]
+http://[IP]:8080
 ```
 
 ## Default Credentials
