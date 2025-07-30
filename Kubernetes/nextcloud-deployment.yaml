@@ -1,32 +1,81 @@
-apiVersion: apps/v1
-kind: Deployment
+---
+apiVersion: v1
+kind: Namespace
 metadata:
-  name: nextcloud-deployment
+  name: containers
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cj
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: multi-container-pod
+  namespace: containers
+  labels:
+    app: multi-container-app
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: nextcloud
-  template:
-    metadata:
-      labels:
-        app: nextcloud
-    spec:
-      containers:
-      - name: nextcloud
-        image: 0xnef/nextcloud-setup:latest
-        ports:
-        - containerPort: 80
+  containers:
+  - name: nginx-container
+    image: nginx:latest
+    ports:
+    - containerPort: 80
+    volumeMounts:
+    - name: shared-volume
+      mountPath: /usr/share/nginx/html
+
+
+  - name: busybox-1
+    image: busybox
+    command: ["/bin/sh", "-c", "echo 'Hello from busy' > /usr/share/nginx/html/index.html && sleep 5"]
+    volumeMounts:
+    - name: shared-volume
+      mountPath: /usr/share/nginx/html
+
+
+  - name: busybox-2
+    image: busybox
+    command: ["/bin/sh", "-c", "tail -f /dev/null"]
+    volumeMounts:
+    - name: shared-volume
+      mountPath: /usr/share/nginx/html
+
+  volumes:
+  - name: shared-volume
+    emptyDir: {}
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: nextcloud-service
+  name: nginx-service
+  namespace: containers
 spec:
-  type: NodePort
   selector:
-    app: nextcloud
+    app: multi-container-app
   ports:
-  - port: 80
-    targetPort: 80
-    nodePort: 30080
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: nginx-curler
+  namespace: cj
+spec:
+  schedule: "*/1 * * * *" 
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: curl-container
+            image: curlimages/curl:latest
+            command: ["curl", "http://nginx-service.containers.svc.cluster.local/"]
+          restartPolicy: OnFailure
