@@ -1,0 +1,9 @@
+auth:
+  rootPassword: rootpass
+  database: nextcloud
+  username: nextcloud
+  password: nextcloudpass
+
+primary:
+  service:
+    type: ClusterIP
