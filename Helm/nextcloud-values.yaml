@@ -1,0 +1,27 @@
+nextcloud:
+  host: 192.168.49.2
+  username: admin
+  password: changeme
+  datadir: /var/www/html/data
+
+externalDatabase:
+  enabled: true
+  type: mysql
+  host: "mysql-svc"
+  user: nextcloud
+  password: "nextcloud"
+  database: nextcloud
+
+ingress:
+  enabled: false
+
+redis:
+  enabled: true
+  auth:
+    enabled: true
+    password: 'password'
+
+service:
+  type: NodePort
+  port: 8080
+  nodePort: 30080
