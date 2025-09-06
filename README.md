@@ -1,5 +1,5 @@
 # Dockerized Nextcloud Server
-This project provides a simple Docker setup for running a self-hosted **Nextcloud** server using **Apache**, **MySQL**.
+This project provides a simple Docker setup for running a self-hosted **Nextcloud** server using **Apache**, **MySQL** with K8s and Helm.
 
 ## How It Works
 1. Installs all necessary dependencies (Apache, PHP, MySQL, Redis, etc.).
